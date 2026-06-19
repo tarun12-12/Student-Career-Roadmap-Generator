@@ -1,0 +1,133 @@
+.roadmap-form {
+  padding: 2.5rem;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-icon {
+  color: var(--accent-indigo);
+  margin-bottom: 0.75rem;
+}
+
+.form-header h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.form-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-label-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='rgba(148, 163, 184, 0.8)' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.field-helper {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.skill-input-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skill-textbox {
+  flex: 1;
+}
+
+.btn-add-skill {
+  padding: 0 1rem;
+}
+
+.skills-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--border-radius-sm);
+  border: 1px dashed var(--border-color);
+}
+
+.skill-tag-badge {
+  gap: 0.25rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.btn-remove-tag {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  margin-left: 2px;
+}
+
+.btn-remove-tag:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-submit {
+  padding: 1rem;
+  font-size: 1.05rem;
+  height: 52px;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin-slow 0.8s linear infinite;
+  display: inline-block;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group.full-width {
+    grid-column: span 1;
+  }
+  .roadmap-form {
+    padding: 1.5rem;
+  }
+}
