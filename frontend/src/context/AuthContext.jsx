@@ -64,15 +64,30 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
+      let res;
+      try {
+        res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+      } catch (networkErr) {
+        // Usually means backend is not reachable (port/server down/CORS blocked by preflight)
+        const msg = networkErr?.message || 'Network error';
+        throw new Error(
+          `Cannot reach backend at ${API_BASE}. ${msg}`
+        );
+      }
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        // ignore non-json responses
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || `Login failed (HTTP ${res.status})`);
       }
 
       localStorage.setItem('token', data.token);

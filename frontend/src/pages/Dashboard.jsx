@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +11,7 @@ import './Dashboard.css';
 const Dashboard = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [roadmaps, setRoadmaps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -37,8 +39,9 @@ const Dashboard = () => {
     try {
       const newRoadmap = await api.post('/roadmap/generate', formData);
       setRoadmaps((prev) => [newRoadmap, ...prev]);
-      showToast(`Roadmap for "${newRoadmap.goal}" generated!`, 'success');
-      setShowForm(false);
+      showToast(`Roadmap for "${newRoadmap.goal}" generated! Redirecting...`, 'success');
+      // Navigate directly to the newly generated roadmap detail page
+      navigate(`/roadmap/${newRoadmap._id}`);
     } catch (err) {
       console.error('Error generating roadmap:', err);
       showToast(err.message || 'Failed to generate roadmap', 'error');

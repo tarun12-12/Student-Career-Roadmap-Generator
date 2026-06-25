@@ -135,7 +135,7 @@ router.get('/', auth, async (req, res) => {
 // @access  Private
 router.get('/:id', auth, async (req, res) => {
   try {
-    const roadmap = await Roadmap.findById(req.id || req.params.id);
+    const roadmap = await Roadmap.findById(req.params.id);
     
     if (!roadmap) {
       return res.status(404).json({ message: 'Roadmap not found' });

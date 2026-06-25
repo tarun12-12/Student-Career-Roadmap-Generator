@@ -54,13 +54,48 @@ const Signup = () => {
 
   const handleGoogleSignIn = async () => {
     setError('');
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    // Fallback to simulated sign in if client_id is placeholder or window.google is not available
+    if (!clientId || clientId.includes('your_google_client_id_here') || !window.google) {
+      setSubmitting(true);
+      try {
+        await loginWithGoogle('Test Google User', 'test.google@example.com');
+        showToast('Signed up and logged in with simulated Google account!', 'success');
+        navigate('/dashboard');
+      } catch (err) {
+        setError(err.message || 'Google authentication failed');
+        showToast('Google login failed', 'error');
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     try {
-      const confirm = window.confirm("Simulate Google Account Selection?\nAccount: Google Student (student@gmail.com)");
-      if (!confirm) return;
+      // Initialize Google Identity Services
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile',
+        callback: async (response) => {
+          try {
+            // Get user info from Google
+            const userResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${response.access_token}` }
+            });
+            const userData = await userResponse.json();
+            
+            await loginWithGoogle(userData.name, userData.email);
+            showToast('Signed up and logged in with Google!', 'success');
+            navigate('/dashboard');
+          } catch (err) {
+            setError(err.message || 'Google authentication failed');
+            showToast('Google login failed', 'error');
+          }
+        },
+      });
       
-      await loginWithGoogle('Google Student', 'student@gmail.com');
-      showToast('Signed up and logged in with Google!', 'success');
-      navigate('/dashboard');
+      client.requestAccessToken();
     } catch (err) {
       setError(err.message || 'Google authentication failed');
       showToast('Google login failed', 'error');

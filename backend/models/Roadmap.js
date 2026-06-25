@@ -56,15 +56,14 @@ const RoadmapSchema = new mongoose.Schema({
   },
 });
 
-// Calculate completed percentage before saving
-RoadmapSchema.pre('save', function (next) {
+// Calculate completed percentage before saving (Mongoose v9 compatible — async, no next)
+RoadmapSchema.pre('save', async function () {
   if (this.steps && this.steps.length > 0) {
     const completedCount = this.steps.filter((step) => step.completed).length;
     this.completedPercentage = Math.round((completedCount / this.steps.length) * 100);
   } else {
     this.completedPercentage = 0;
   }
-  next();
 });
 
 module.exports = mongoose.model('Roadmap', RoadmapSchema);

@@ -396,24 +396,71 @@ const generateRoadmap = (goal, educationLevel, currentSkills = []) => {
 
   // Customize based on currentSkills
   // Mark steps as completed if the user lists skills that cover at least 50% of the step's skills
+  const normalizeSkill = (s) => {
+    return String(s)
+      .toLowerCase()
+      .replace(/\(.*?\)/g, '')
+      .replace(/[^a-z0-9+\s/.-]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const skillMatches = (templateSkill, userSkill) => {
+    const t = normalizeSkill(templateSkill);
+    const u = normalizeSkill(userSkill);
+
+    if (!t || !u) return false;
+    if (t === u) return true;
+
+    // Common normalization: React -> React.js
+    const aliasMap = {
+      react: 'react.js',
+      'reactjs': 'react.js',
+      javascript: 'javascript es6+',
+      'js': 'javascript es6+',
+      'nodejs': 'node.js',
+      'node js': 'node.js',
+      'expo': 'expo framework',
+      'mongodb': 'mongodb / mongoose',
+      'sql': 'postgresql',
+    };
+
+    const tAliased = aliasMap[t] || t;
+    const uAliased = aliasMap[u] || u;
+
+    if (tAliased === uAliased) return true;
+    if (tAliased.includes(uAliased) || uAliased.includes(tAliased)) return true;
+
+    // Token overlap
+    const tTokens = tAliased.split(/\s|\//).filter(Boolean);
+    const uTokens = uAliased.split(/\s|\//).filter(Boolean);
+    const tSet = new Set(tTokens);
+    const overlap = uTokens.some((tok) => tSet.has(tok));
+    return overlap;
+  };
+
   template.steps = template.steps.map((step) => {
-    // Check if the user already has some of the skills required for this step
-    const matchingSkills = step.skillsToAcquire.filter((skill) =>
-      currentSkills.some((userSkill) => userSkill.toLowerCase() === skill.toLowerCase())
+    const templateSkills = Array.isArray(step.skillsToAcquire) ? step.skillsToAcquire : [];
+
+    // Find which template skills match at least one user skill (fuzzy)
+    const matchingSkills = templateSkills.filter((tplSkill) =>
+      currentSkills.some((userSkill) => skillMatches(tplSkill, userSkill))
     );
+
+    const matchRatio = templateSkills.length > 0 ? (matchingSkills.length / templateSkills.length) : 0;
 
     let completed = false;
     let description = step.description;
 
     if (matchingSkills.length > 0) {
-      if (matchingSkills.length === step.skillsToAcquire.length) {
-        // Has all skills for this step!
+      if (matchRatio >= 0.5) {
         completed = true;
-        description += ` (Note: You've listed all skills for this section: ${matchingSkills.join(', ')}. Marked as complete!)`;
+        description += ` (Note: You've covered ${Math.round(matchRatio * 100)}% of this section's skills (${matchingSkills.join(', ')}). Marked as complete!)`;
       } else {
         description += ` (Note: You already know ${matchingSkills.join(', ')}. Focus on acquiring the remaining skills!)`;
       }
     }
+
 
     // Adjust estimated time based on education level
     let estimatedTime = step.estimatedTime;
