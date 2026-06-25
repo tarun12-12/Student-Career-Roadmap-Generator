@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://locthost:5000';
 
 const api = {
   getHeaders() {
@@ -15,7 +15,7 @@ const api = {
   async request(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
     const headers = { ...this.getHeaders(), ...options.headers };
-    
+
     const config = {
       ...options,
       headers,
@@ -24,11 +24,11 @@ const api = {
     try {
       const response = await fetch(url, config);
       const data = await response.json().catch(() => ({}));
-      
+
       if (!response.ok) {
         throw new Error(data.message || `Request failed with status ${response.status}`);
       }
-      
+
       return data;
     } catch (error) {
       console.error(`API Error in ${endpoint}:`, error.message);
