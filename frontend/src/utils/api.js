@@ -1,43 +1,60 @@
-const API_BASE = 'https://locthost:5000';
+const API_BASE =
+  import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const api = {
   getHeaders() {
     const headers = {
       'Content-Type': 'application/json',
     };
+
     const token = localStorage.getItem('token');
+
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
+
     return headers;
   },
 
   async request(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
-    const headers = { ...this.getHeaders(), ...options.headers };
 
     const config = {
       ...options,
-      headers,
+      headers: {
+        ...this.getHeaders(),
+        ...options.headers,
+      },
     };
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json().catch(() => ({}));
+
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || `Request failed with status ${response.status}`);
+        throw new Error(
+          data.message || `Request failed with status ${response.status}`
+        );
       }
 
       return data;
     } catch (error) {
-      console.error(`API Error in ${endpoint}:`, error.message);
+      console.error(`API Error in ${endpoint}:`, error);
       throw error;
     }
   },
 
   get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
+    return this.request(endpoint, {
+      method: 'GET',
+    });
   },
 
   post(endpoint, body) {
@@ -55,7 +72,9 @@ const api = {
   },
 
   delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
+    return this.request(endpoint, {
+      method: 'DELETE',
+    });
   },
 };
 
